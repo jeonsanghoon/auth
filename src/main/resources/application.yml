@@ -11,7 +11,5 @@ spring:
     properties.hibernate.hbm2ddl.auto: update
     showSql: true
   messages:
-    always-use-message-format: false
-    cache-seconds: -1
     basename: i18n/exception
     encoding: UTF-8
