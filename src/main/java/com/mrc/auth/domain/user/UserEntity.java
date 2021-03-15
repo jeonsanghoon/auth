@@ -1,50 +1,75 @@
 package com.mrc.auth.domain.user;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
-@Entity
-@Table(name = "user")
-public class UserEntity {
-    @Id // primaryKey임을 알립니다.
-    @GeneratedValue(strategy = GenerationType.IDENTITY) //  pk생성전략을 DB에 위임한다는 의미입니다. mysql로 보면 pk 필드를 auto_increment로 설정해 놓은 경우로 보면 됩니다.
+@Builder // builder를 사용할수 있게 합니다.
+@Entity // jpa entity임을 알립니다.
+@Getter // user 필드값의 getter를 자동으로 생성합니다.
+@NoArgsConstructor // 인자없는 생성자를 자동으로 생성합니다.
+@AllArgsConstructor // 인자를 모두 갖춘 생성자를 자동으로 생성합니다.
+@Table(name = "user") // 'user' 테이블과 매핑됨을 명시
+public class UserEntity implements UserDetails {
+    @Id // pk
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long msrl;
-    @Column(nullable = false, unique = true, length = 30) // uid column을 명시합니다. 필수이고 유니크한 필드이며 길이는 30입니다.
+    @Column(nullable = false, unique = true, length = 50)
     private String uid;
-    @Column(nullable = false, length = 100) // name column을 명시합니다. 필수이고 길이는 100입니다.
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @Column(length = 100)
+    private String password;
+    @Column(nullable = false, length = 100)
     private String name;
+    @Column(length = 100)
+    private String provider;
 
-    public UserEntity() {}
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Builder.Default
+    private List<String> roles = new ArrayList<>();
 
-    public UserEntity(String uid, String name) {
-        this.uid = uid;
-        this.name = name;
-    }
-    public UserEntity(Long msrl, String uid, String name) {
-        this.msrl = msrl;
-        this.uid = uid;
-        this.name = name;
-    }
-
-    public long getMsrl() {
-        return msrl;
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return this.roles.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
     }
 
-    public void setMsrl(long msrl) {
-        this.msrl = msrl;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @Override
+    public String getUsername() {
+        return this.uid;
     }
 
-    public String getUid() {
-        return uid;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
     }
 
-    public void setUid(String uid) {
-        this.uid = uid;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
     }
 
-    public String getName() {
-        return name;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 }
