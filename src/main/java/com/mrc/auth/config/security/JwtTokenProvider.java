@@ -8,6 +8,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -27,10 +28,10 @@ import java.util.List;
 public class JwtTokenProvider { // JWT 토큰을 생성 및 검증 모듈
 
     @Value("spring.jwt.secret")
+    @Getter
     private String secretKey;
 
-    private long tokenValidMilisecond = 1000L * 60 * 60; // 1시간만 토큰 유효
-
+    private long tokenValidMilisecond = 1000L * 60 * 60 * 24 * 7; // 1주일만 토큰 유효
     private final UserDetailsService userDetailsService;
 
     @PostConstruct
@@ -42,9 +43,12 @@ public class JwtTokenProvider { // JWT 토큰을 생성 및 검증 모듈
     public String createToken(String userPk, List<String> roles) {
         Claims claims = Jwts.claims().setSubject(userPk);
         claims.put("roles", roles);
+
+
         Date now = new Date();
         return Jwts.builder()
                 .setClaims(claims) // 데이터
+
                 .setIssuedAt(now) // 토큰 발행일자
                 .setExpiration(new Date(now.getTime() + tokenValidMilisecond)) // set Expire Time
                 .signWith(SignatureAlgorithm.HS256, secretKey) // 암호화 알고리즘, secret값 세팅
