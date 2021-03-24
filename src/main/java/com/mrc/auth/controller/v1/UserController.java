@@ -5,6 +5,7 @@ import com.mrc.auth.domain.common.CommonResult;
 import com.mrc.auth.domain.common.ListResult;
 import com.mrc.auth.domain.common.ResponseService;
 import com.mrc.auth.domain.common.SingleResult;
+import com.mrc.auth.domain.kakao.dto.KakaoProfileDTO;
 import com.mrc.auth.domain.user.UserEntity;
 import com.mrc.auth.domain.user.UserJpaRepo;
 import io.swagger.annotations.*;
@@ -62,4 +63,5 @@ public class UserController {
         // 성공 결과 정보만 필요한경우 getSuccessResult()를 이용하여 결과를 출력한다.
         return responseService.getSuccessResult();
     }
+
 }
