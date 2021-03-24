@@ -1,4 +1,4 @@
-package com.mrc.auth.controller.v1;
+package com.mrc.auth.domain.user;
 
 import com.mrc.auth.advice.exception.UserNotFoundException;
 import com.mrc.auth.domain.common.CommonResult;
